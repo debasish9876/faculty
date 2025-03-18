@@ -14,7 +14,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
   final FirestoreService _firestoreService = FirestoreService();
-  bool _isStudentLogin = true; // Toggle between student and faculty login
 
   @override
   void initState() {
@@ -27,13 +26,8 @@ class _LoginScreenState extends State<LoginScreen> {
     String? email = prefs.getString('email');
     String? role = prefs.getString('role');
 
-
-    if (email != null && role != null) {
-      if (role == 'student') {
-        Navigator.pushReplacementNamed(context, '/studentDashboard', arguments: email);
-      } else if (role == 'faculty') {
-        Navigator.pushReplacementNamed(context, '/facultyDashboard', arguments: email);
-      }
+    if (email != null && role == 'faculty') {
+      Navigator.pushReplacementNamed(context, '/facultyDashboard', arguments: email);
     }
   }
 
@@ -41,7 +35,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('email', email);
     await prefs.setString('role', role);
-    // await prefs.setString('name', name);
   }
 
   Future<void> _login() async {
@@ -62,19 +55,14 @@ class _LoginScreenState extends State<LoginScreen> {
         // Get user role from Firestore
         String? role = await _firestoreService.getUserRole(user.uid);
 
-        if (_isStudentLogin && role == 'student') {
-          await _saveCredentials(email, 'student');
-          Navigator.pushReplacementNamed(context, '/studentDashboard', arguments: user.uid);
-        } else if (!_isStudentLogin && role == 'faculty') {
+        if (role == 'faculty') {
           await _saveCredentials(email, 'faculty');
-          String facultyName = await _firestoreService.getFacultyName(user.uid); // Get faculty name
           Navigator.pushReplacementNamed(context, '/facultyDashboard', arguments: {
             'uid': user.uid,
-             //'facultyName': facultyName,
           });
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Invalid role for the selected login type."),
+            content: Text("Unauthorized access. Only faculty members can log in."),
           ));
         }
       }
@@ -88,53 +76,53 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text(
-              _isStudentLogin ? 'Student Login' : 'Faculty Login',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background Image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/back3.jpeg', // Replace with your image
+              fit: BoxFit.cover,
             ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _login,
-              child: Text('Login'),
-            ),
-            if (_isStudentLogin)
-              TextButton(
-                onPressed: () {
-                  // Navigate to register screen
-                  Navigator.pushNamed(context, '/register');
-                },
-                child: Text('Register as Student'),
+          ),
+          // Login Form
+          Center(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(20),
               ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _isStudentLogin = !_isStudentLogin;
-                });
-              },
-              child: Text(_isStudentLogin
-                  ? 'Switch to Faculty Login'
-                  : 'Switch to Student Login'),
+              width: 350,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Faculty Login',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 20),
+                  TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(labelText: 'Email'),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  TextField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _login,
+                    child: Text('Login'),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

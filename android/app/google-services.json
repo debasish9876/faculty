@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "876076482384",
+    "firebase_url": "https://faculty-8f308-default-rtdb.firebaseio.com",
     "project_id": "faculty-8f308",
     "storage_bucket": "faculty-8f308.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.gietu.faculty"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "876076482384-72h36r41qubc010svrpc2tu9a8uujbtg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gietu.faculty",
+            "certificate_hash": "abf3216f4171cf2ed05d418c566246f3fdf4c707"
+          }
+        },
+        {
+          "client_id": "876076482384-vrh63fh9f36c64k9ugv74g0b8n14pn9v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBfQJuGGPNT3yWYdKGFrA7-tXuTeWeu2Zw"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "876076482384-vrh63fh9f36c64k9ugv74g0b8n14pn9v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
